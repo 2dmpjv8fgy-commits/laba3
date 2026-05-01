@@ -1,12 +1,21 @@
 cmake_minimum_required(VERSION 3.10)
-project(print)
+project(formatter_project)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+# Библиотеки
+add_library(formatter STATIC formatter_lib/formatter.cpp)
+add_library(formatter_ex STATIC formatter_ex_lib/formatter_ex.cpp)
+add_library(solver STATIC solver_lib/solver.cpp)
 
-add_library(print STATIC sources/print.cpp)
+# Указываем пути к заголовкам для всех
+include_directories(formatter_lib formatter_ex_lib solver_lib)
 
-add_executable(example1 examples/example1.cpp)
-target_link_libraries(example1 print)
+# Сборка Hello World
+add_executable(hello_world hello_world_application/main.cpp)
+target_link_libraries(hello_world formatter)
+
+# Сборка Solver App
+add_executable(solver_app solver_application/main.cpp)
+target_link_libraries(solver_app formatter solver)
