@@ -1,4 +1,0 @@
-/Users/aleksandrgolikov/workspace/projects/laba3/_build/CMakeFiles/print.dir
-/Users/aleksandrgolikov/workspace/projects/laba3/_build/CMakeFiles/example1.dir
-/Users/aleksandrgolikov/workspace/projects/laba3/_build/CMakeFiles/edit_cache.dir
-/Users/aleksandrgolikov/workspace/projects/laba3/_build/CMakeFiles/rebuild_cache.dir
