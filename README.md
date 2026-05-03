@@ -5,15 +5,15 @@
 Структура проекта
 В ходе работы была создана модульная структура:
 
- `formatter_lib` — библиотека для форматирования строк.
+ `formatter_lib` — статическая библиотека для форматирования строк. Содержит локальный CMakeLists.txt для сборки цели formatter.
  
- `formatter_ex_lib` — расширенная библиотека форматирования.
+ `formatter_ex_lib` — расширенная библиотека, зависящая от formatter. Содержит локальный CMakeLists.txt.
  
- `solver_lib` — библиотека для решения квадратных уравнений.
+ `solver_lib` — библиотека для решения уравнений. Содержит локальный CMakeLists.txt для сборки цели solver.
  
- `hello_world_application` — приложение для вывода приветствия.
+ `hello_world_application` — приложение, использующее библиотеку formatter.
  
- `solver_application` — приложение для решения уравнений.
+ `solver_application` — приложение для решения уравнений, использующее библиотеки formatter и solver.
 
 <details>
 <summary>Вывод</summary>
@@ -120,6 +120,19 @@ void formatter_ex(const std::string& message, std::ostream& out) {
 }
 EOF
 
+cat > formatter_lib/CMakeLists.txt <<EOF
+add_library(formatter STATIC formatter.cpp)
+EOF
+
+cat > formatter_ex_lib/CMakeLists.txt <<EOF
+add_library(formatter_ex STATIC formatter_ex.cpp)
+target_link_libraries(formatter_ex formatter)
+EOF
+
+cat > solver_lib/CMakeLists.txt <<EOF
+add_library(solver STATIC solver.cpp)
+EOF
+
 cat > CMakeLists.txt <<EOF
 cmake_minimum_required(VERSION 3.10)
 project(formatter_project)
@@ -127,22 +140,19 @@ project(formatter_project)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Библиотеки
-add_library(formatter STATIC formatter_lib/formatter.cpp)
-add_library(formatter_ex STATIC formatter_ex_lib/formatter_ex.cpp)
-add_library(solver STATIC solver_lib/solver.cpp)
-
-# Указываем пути к заголовкам для всех
 include_directories(formatter_lib formatter_ex_lib solver_lib)
 
-# Сборка Hello World
+add_subdirectory(formatter_lib)
+add_subdirectory(formatter_ex_lib)
+add_subdirectory(solver_lib)
+
 add_executable(hello_world hello_world_application/main.cpp)
 target_link_libraries(hello_world formatter)
 
-# Сборка Solver App
 add_executable(solver_app solver_application/main.cpp)
 target_link_libraries(solver_app formatter solver)
 EOF
+
 ```
 </details>
 
@@ -152,19 +162,7 @@ EOF
 <summary>Вывод</summary>
 
 ```bash
--- The C compiler identification is AppleClang 17.0.0.17000013
--- The CXX compiler identification is AppleClang 17.0.0.17000013
--- Detecting C compiler ABI info
--- Detecting C compiler ABI info - done
--- Check for working C compiler: /usr/bin/cc - skipped
--- Detecting C compile features
--- Detecting C compile features - done
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: /usr/bin/c++ - skipped
--- Detecting CXX compile features
--- Detecting CXX compile features - done
--- Configuring done (0.5s)
+-- Configuring done (0.1s)
 -- Generating done (0.0s)
 -- Build files have been written to: /Users/aleksandrgolikov/workspace/projects/laba3/_build
 ```
@@ -176,21 +174,19 @@ EOF
 <summary>Вывод</summary>
 
 ```bash
-[ 10%] Building CXX object CMakeFiles/formatter.dir/formatter_lib/formatter.cpp.o
+[ 10%] Building CXX object formatter_lib/CMakeFiles/formatter.dir/formatter.cpp.o
 [ 20%] Linking CXX static library libformatter.a
 [ 20%] Built target formatter
-[ 30%] Building CXX object CMakeFiles/formatter_ex.dir/formatter_ex_lib/formatter_ex.cpp.o
-[ 40%] Linking CXX static library libformatter_ex.a
-[ 40%] Built target formatter_ex
-[ 50%] Building CXX object CMakeFiles/solver.dir/solver_lib/solver.cpp.o
+[ 30%] Linking CXX executable hello_world
+[ 40%] Built target hello_world
+[ 50%] Building CXX object solver_lib/CMakeFiles/solver.dir/solver.cpp.o
 [ 60%] Linking CXX static library libsolver.a
 [ 60%] Built target solver
-[ 70%] Building CXX object CMakeFiles/hello_world.dir/hello_world_application/main.cpp.o
-[ 80%] Linking CXX executable hello_world
-[ 80%] Built target hello_world
-[ 90%] Building CXX object CMakeFiles/solver_app.dir/solver_application/main.cpp.o
-[100%] Linking CXX executable solver_app
-[100%] Built target solver_app
+[ 70%] Linking CXX executable solver_app
+[ 80%] Built target solver_app
+[ 90%] Building CXX object formatter_ex_lib/CMakeFiles/formatter_ex.dir/formatter_ex.cpp.o
+[100%] Linking CXX static library libformatter_ex.a
+[100%] Built target formatter_ex
 ```
 </details>
 
@@ -212,36 +208,48 @@ x1 = 1.000000, x2 = 2.000000
 ```
 </details>
 
-Для фиксации итоговых результатов работы в системе контроля версий были выполнены команды индексации, компиляции изменений и их отправки в удаленный репозиторий GitHub:
+Для завершения работы проект был переведен на модульную систему сборки, а все изменения зафиксированы в Git и синхронизированы с удаленным репозиторием GitHub:
+
 `git add .`
-`git commit -m "fixed"`
+
+`git commit -m "added modular cmake structure"`
+
+<details>
+<summary>Вывод</summary>
+
+```bash
+[main 0bfc51a] added modular cmake structure
+ 4 files changed, 8 insertions(+), 8 deletions(-)
+ create mode 100644 formatter_ex_lib/CMakeLists.txt
+ create mode 100644 formatter_lib/CMakeLists.txt
+ create mode 100644 solver_lib/CMakeLists.txt
+```
+</details>
+
+`git pull origin main --no-rebase`
+
+<details>
+<summary>Вывод</summary>
+
+```bash
+Из github.com:2dmpjv8fgy-commits/laba3
+ * branch            main       -> FETCH_HEAD
+Merge made by the 'ort' strategy.
+ README.md | 247 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 247 insertions(+)
+```
+</details>
+
 `git push origin main`
 
 <details>
 <summary>Вывод</summary>
 
 ```bash
-[main fcae902] fixed
- 12 files changed, 69 insertions(+), 21 deletions(-)
- delete mode 100644 examples/example1.cpp
- create mode 100644 formatter_ex_lib/formatter_ex.cpp
- create mode 100644 formatter_ex_lib/formatter_ex.h
- create mode 100644 formatter_lib/formatter.cpp
- create mode 100644 formatter_lib/formatter.h
- create mode 100644 hello_world_application/main.cpp
- delete mode 100644 include/print.hpp
- create mode 100644 solver_application/main.cpp
- create mode 100644 solver_lib/solver.cpp
- create mode 100644 solver_lib/solver.h
- delete mode 100644 sources/print.cpp
-
-Перечисление объектов: 18, готово.
-Подсчет объектов: 100% (18/18), готово.
+Перечисление объектов: 21, готово.
+Подсчет объектов: 100% (17/17), готово.
 При сжатии изменений используется до 12 потоков
-Сжатие объектов: 100% (14/14), готово.
-Запись объектов: 100% (16/16), 2.10 KiB | 2.10 MiB/s, готово.
-Total 16 (delta 0), reused 0 (delta 0), pack-reused 0 (from 0)
-To github.com:2dmpjv8fgy-commits/laba3.git
-   6d43e38..fcae902  main -> main
+Сжатие объектов: 100% (9/9), готово.
+Запись объектов: 100% (11/11), 1.18 KiB | 1.18 MiB/s, готово.
 ```
 </details>
